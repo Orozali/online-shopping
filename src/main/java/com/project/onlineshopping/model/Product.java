@@ -20,7 +20,7 @@ public class Product {
     private double price;
     private String description;
     @ManyToOne
-    @JoinColumn(name = "category_id",referencedColumnName = "id")
+    @JoinColumn(name = "category",referencedColumnName = "name")
     private Category category;
 
 }

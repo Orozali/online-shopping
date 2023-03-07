@@ -20,6 +20,9 @@ public class CategoryService {
     public List<Category> findAll() {
         return categoryRepository.findAll(Sort.by("id"));
     }
+    public Optional<Category> findByName(String name){
+        return categoryRepository.findByName(name);
+    }
     @Transactional
     public void save(Category category) {
         categoryRepository.save(category);

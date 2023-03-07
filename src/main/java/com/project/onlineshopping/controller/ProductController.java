@@ -1,6 +1,9 @@
 package com.project.onlineshopping.controller;
 
 import com.project.onlineshopping.dto.ProductDTO;
+import com.project.onlineshopping.exceptions.CategoryNotFoundException;
+import com.project.onlineshopping.exceptions.ErrorMessage;
+import com.project.onlineshopping.model.Category;
 import com.project.onlineshopping.model.Product;
 import com.project.onlineshopping.service.ProductService;
 import com.project.onlineshopping.utils.ApiResponse;
@@ -11,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @RestController
@@ -31,8 +36,22 @@ public class ProductController {
                 ,"A new product created"),HttpStatus.CREATED);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ErrorMessage> categoryNotFound(CategoryNotFoundException exception){
+        ErrorMessage msg = new ErrorMessage(exception.getMsg());
+        return new ResponseEntity<>(msg,HttpStatus.BAD_REQUEST);
+    }
 
     public Product convert(ProductDTO productDTO){
-        return modelMapper.map(productDTO,Product.class);
+        Category category = new Category();
+        Product product = new Product();
+        product.setName(productDTO.getName());
+        product.setPrice(productDTO.getPrice());
+        product.setDescription(productDTO.getDescription());
+        product.setImageURL(productDTO.getImageURL());
+
+        category.setName(productDTO.getCategoryDTO().getName());
+        product.setCategory(category);
+        return product;
     }
 }

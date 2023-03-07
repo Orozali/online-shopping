@@ -12,16 +12,10 @@ import org.springframework.stereotype.Component;
 @NoArgsConstructor
 @Component
 public class ProductDTO {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
     private String name;
     private String imageURL;
     private double price;
     private String description;
-    @ManyToOne
-    @JoinColumn(name = "category_id",referencedColumnName = "id")
     private CategoryDTO categoryDTO;
 
 }
