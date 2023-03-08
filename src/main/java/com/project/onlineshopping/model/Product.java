@@ -22,5 +22,8 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category",referencedColumnName = "name")
     private Category category;
+    @ManyToOne
+    @JoinColumn(name = "product_type",referencedColumnName = "name")
+    private Type type;
 
 }

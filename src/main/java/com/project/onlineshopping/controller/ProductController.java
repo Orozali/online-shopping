@@ -5,6 +5,7 @@ import com.project.onlineshopping.exceptions.CategoryNotFoundException;
 import com.project.onlineshopping.exceptions.ErrorMessage;
 import com.project.onlineshopping.model.Category;
 import com.project.onlineshopping.model.Product;
+import com.project.onlineshopping.model.Type;
 import com.project.onlineshopping.service.ProductService;
 import com.project.onlineshopping.utils.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -44,14 +45,17 @@ public class ProductController {
 
     public Product convert(ProductDTO productDTO){
         Category category = new Category();
+        Type type = new Type();
         Product product = new Product();
         product.setName(productDTO.getName());
         product.setPrice(productDTO.getPrice());
         product.setDescription(productDTO.getDescription());
         product.setImageURL(productDTO.getImageURL());
 
+        type.setName(productDTO.getTypeDTO().getName());
         category.setName(productDTO.getCategoryDTO().getName());
         product.setCategory(category);
+        product.setType(type);
         return product;
     }
 }

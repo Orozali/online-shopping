@@ -3,6 +3,7 @@ package com.project.onlineshopping.service;
 import com.project.onlineshopping.exceptions.CategoryNotFoundException;
 import com.project.onlineshopping.model.Category;
 import com.project.onlineshopping.model.Product;
+import com.project.onlineshopping.model.Type;
 import com.project.onlineshopping.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.Optional;
 public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryService categoryService;
+    private final TypeService typeService;
 
     public List<Product> findAll() {
         return productRepository.findAll();
@@ -24,10 +26,12 @@ public class ProductService {
     @Transactional
     public void save(Product product) {
         Optional<Category> category = categoryService.findByName(product.getCategory().getName());
-        if(category.isEmpty()){
+        Optional<Type> type = typeService.findByName(product.getType().getName());
+        if(category.isEmpty() || type.isEmpty()){
             throw new CategoryNotFoundException("Категория с таким именем не найдена!");
         }
         product.setCategory(category.get());
+        product.setType(type.get());
         productRepository.save(product);
     }
 }
