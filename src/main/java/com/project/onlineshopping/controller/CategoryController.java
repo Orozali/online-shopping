@@ -2,6 +2,7 @@ package com.project.onlineshopping.controller;
 
 import com.project.onlineshopping.exceptions.CategoryNotFoundException;
 import com.project.onlineshopping.exceptions.ErrorMessage;
+import com.project.onlineshopping.exceptions.ModelAlreadyExistException;
 import com.project.onlineshopping.model.Category;
 import com.project.onlineshopping.model.Type;
 import com.project.onlineshopping.service.CategoryService;
@@ -39,6 +40,11 @@ public class CategoryController {
     public ResponseEntity<List<Type>> listOfTypes(){
         return new ResponseEntity<>(typeService.findAll(),HttpStatus.OK);
     }
+    @PostMapping("/type/update/{id}")
+    public ResponseEntity<ApiResponse> listOfTypes(@PathVariable("id") int id,@RequestBody Type type){
+        typeService.update(type,id);
+        return new ResponseEntity<>(new ApiResponse(true,"Category was updated!"),HttpStatus.OK);
+    }
     @PostMapping("/type/create")
     public ResponseEntity<ApiResponse> createType(@RequestBody Type type){
         typeService.save(type);
@@ -48,6 +54,11 @@ public class CategoryController {
     @ExceptionHandler
     public ResponseEntity<ErrorMessage> error(CategoryNotFoundException exception){
         ErrorMessage message = new ErrorMessage(exception.getMsg());
+        return new ResponseEntity<>(message,HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler
+    public ResponseEntity<ErrorMessage> modelAlreadyExist(ModelAlreadyExistException exception){
+        ErrorMessage message = new ErrorMessage(exception.getMessage());
         return new ResponseEntity<>(message,HttpStatus.BAD_REQUEST);
     }
 

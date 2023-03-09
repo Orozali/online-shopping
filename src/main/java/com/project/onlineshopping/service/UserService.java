@@ -26,7 +26,6 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final TokenService tokenService;
-    private final PasswordEncoder passwordEncoder;
     @Transactional
     public void signUp(UserInfo user) {
         Optional<UserInfo> takenUser = userRepository.findByEmail(user.getEmail());
@@ -75,4 +74,5 @@ public class UserService {
         byte[] digest = md.digest();
         return DatatypeConverter.printHexBinary(digest).toUpperCase();
     }
+
 }

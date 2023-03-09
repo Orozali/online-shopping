@@ -26,16 +26,15 @@ public class AuthenticationController {
     private final UserService userService;
 
     @PostMapping("/sign-up")
-    public SignUpResponseDTO signUp(@RequestBody UserInfoDTO userDTO){
+    public ResponseEntity<SignUpResponseDTO> signUp(@RequestBody UserInfoDTO userDTO){
         UserInfo user = convert(userDTO);
         userService.signUp(user);
-        return new SignUpResponseDTO("success","Пользователь успешно зарегистрировалось!");
+        return new ResponseEntity<>(new SignUpResponseDTO("success","Пользователь успешно зарегистрировалось!"),HttpStatus.OK);
     }
 
     @PostMapping("/sign-in")
-    public SignInResponseDTO signIn(@RequestBody SignInDTO signInDTO) throws NoSuchAlgorithmException {
-//        UserInfo user = convert(signInDTO);
-            return userService.signIn(signInDTO);
+    public ResponseEntity<SignInResponseDTO> signIn(@RequestBody SignInDTO signInDTO) throws NoSuchAlgorithmException {
+            return new ResponseEntity<>(userService.signIn(signInDTO),HttpStatus.OK);
     }
 
     public UserInfo convert(UserInfoDTO userDTO){

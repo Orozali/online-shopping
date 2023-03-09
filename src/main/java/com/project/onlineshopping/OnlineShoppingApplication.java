@@ -22,4 +22,5 @@ public class OnlineShoppingApplication {
 	public PasswordEncoder passwordEncoder(){
 		return new BCryptPasswordEncoder();
 	}
+
 }
