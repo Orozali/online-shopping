@@ -3,6 +3,7 @@ package com.project.onlineshopping.service;
 import com.project.onlineshopping.exceptions.CategoryNotFoundException;
 import com.project.onlineshopping.model.Category;
 import com.project.onlineshopping.model.Product;
+import com.project.onlineshopping.model.Product_size;
 import com.project.onlineshopping.model.Type;
 import com.project.onlineshopping.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryService categoryService;
     private final TypeService typeService;
+    private final ProductSizeService productSizeService;
 
     public List<Product> findAll() {
         return productRepository.findAll();
@@ -33,6 +35,11 @@ public class ProductService {
         }
         product.setCategory(category.get());
         product.setType(type.get());
+
+        Product_size productSize = product.getProductSize();
+        productSizeService.save(productSize);
+        product.setProductSize(product.getProductSize());
+
         product.setCreatedAt(new Date());
         productRepository.save(product);
     }

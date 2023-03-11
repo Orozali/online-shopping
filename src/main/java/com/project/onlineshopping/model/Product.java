@@ -28,6 +28,26 @@ public class Product {
     private String description;
     @Column(name = "createdat")
     private Date createdAt;
+    @Column(name = "carcas")
+    private String carcas;
+    @Column(name = "meachanism")
+    private String meachanism;
+    @Column(name = "material")
+    private String material;
+    @Column(name = "usb")
+    private String usb;
+    @Column(name = "removable_case")
+    private String removable_case;
+    @Column(name = "decorative_pillow")
+    private String decorative_pillow;
+    @Column(name = "delivery_option")
+    private String delivery_option;
+    @Column(name = "manufacturer")
+    private String manufacturer;
+
+    @OneToOne(targetEntity = Product_size.class)
+    @JoinColumn(name = "product_size_id",referencedColumnName = "id")
+    private Product_size productSize;
     @ManyToOne
     @JoinColumn(name = "category",referencedColumnName = "name")
     private Category category;
