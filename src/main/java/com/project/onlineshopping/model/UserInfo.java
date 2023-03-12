@@ -26,6 +26,7 @@ public class UserInfo {
     @Column(name = "role")
     private String role;
 
+
     @OneToOne(mappedBy = "user")
     private AuthenticationToken token;
 

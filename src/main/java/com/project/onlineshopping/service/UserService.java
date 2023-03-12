@@ -75,4 +75,7 @@ public class UserService {
         return DatatypeConverter.printHexBinary(digest).toUpperCase();
     }
 
+    public Optional<UserInfo> findById(int userId) {
+        return userRepository.findById(userId);
+    }
 }

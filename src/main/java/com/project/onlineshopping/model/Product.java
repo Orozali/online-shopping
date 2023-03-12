@@ -55,4 +55,6 @@ public class Product {
     @JoinColumn(name = "product_type",referencedColumnName = "name")
     private Type type;
 
+
+
 }
