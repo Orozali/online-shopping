@@ -44,6 +44,8 @@ public class Product {
     private String delivery_option;
     @Column(name = "manufacturer")
     private String manufacturer;
+    @Column(name = "quantity")
+    private Integer quantity;
 
     @OneToOne(targetEntity = Product_size.class)
     @JoinColumn(name = "product_size_id",referencedColumnName = "id")

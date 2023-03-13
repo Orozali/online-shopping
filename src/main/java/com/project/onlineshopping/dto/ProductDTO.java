@@ -26,6 +26,7 @@ public class ProductDTO {
     private String decorative_pillow;
     private String delivery_option;
     private String manufacturer;
+    private Integer quantity;
     private CategoryDTO categoryDTO;
     private TypeDTO typeDTO;
     private ProductSizeDTO productSizeDTO;

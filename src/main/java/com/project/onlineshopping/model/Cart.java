@@ -20,6 +20,8 @@ public class Cart {
     private Integer id;
     @Column(name = "created_at")
     private Date date;
+    @Column(name = "quantity")
+    private Integer quantity;
     @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private UserInfo userInfo;
@@ -27,10 +29,11 @@ public class Cart {
     @JoinColumn(name = "product_id",referencedColumnName = "id")
     private Product product;
 
-    public Cart(UserInfo user, Product product, Date date){
+    public Cart(UserInfo user, Product product, Date date,Integer quantity){
         this.userInfo = user;
         this.product = product;
         this.date = date;
+        this.quantity = quantity;
     }
 
 }
