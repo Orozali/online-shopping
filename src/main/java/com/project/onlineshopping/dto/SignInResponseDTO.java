@@ -1,11 +1,8 @@
 package com.project.onlineshopping.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Getter @Setter @AllArgsConstructor @NoArgsConstructor
+@Getter @Setter @AllArgsConstructor @NoArgsConstructor @Builder
 public class SignInResponseDTO {
     private String status;
     private String token;

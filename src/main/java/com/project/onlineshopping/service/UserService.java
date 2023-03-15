@@ -2,80 +2,64 @@ package com.project.onlineshopping.service;
 
 import com.project.onlineshopping.dto.SignInDTO;
 import com.project.onlineshopping.dto.SignInResponseDTO;
-import com.project.onlineshopping.exceptions.AuthenticationFailException;
-import com.project.onlineshopping.exceptions.TokenNullException;
-import com.project.onlineshopping.exceptions.UserAlreadyExistException;
+import com.project.onlineshopping.dto.SignUpResponseDTO;
 import com.project.onlineshopping.model.AuthenticationToken;
 import com.project.onlineshopping.model.UserInfo;
+import com.project.onlineshopping.repository.TokenRepository;
 import com.project.onlineshopping.repository.UserRepository;
-import jakarta.xml.bind.DatatypeConverter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.attribute.UserPrincipalNotFoundException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
+import java.util.Date;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class UserService {
-    private final UserRepository userRepository;
-    private final TokenService tokenService;
-    @Transactional
-    public void signUp(UserInfo user) {
-        Optional<UserInfo> takenUser = userRepository.findByEmail(user.getEmail());
-        if(takenUser.isEmpty()){
-            AuthenticationToken token = new AuthenticationToken(user);
-            tokenService.save(token);
-            try {
-                user.setPassword(hashPassword(user.getPassword()));
-            }catch (NoSuchAlgorithmException e){
-                e.printStackTrace();
-                throw new AuthenticationFailException(e.getMessage());
-            }
-            user.setRole("user");
-            user.setToken(token);
-            userRepository.save(user);
-        }
-        else {
-            throw new UserAlreadyExistException("Пользователь с таким email адресом уже существует!");
-        }
+public class UserService implements UserDetailsService {
+    private final UserRepository repository;
+    private final TokenRepository tokenRepository;
+    private final PasswordEncoder passwordEncoder;
+    public Optional<UserInfo> findById(int id){
+        return repository.findById(id);
     }
 
-    public SignInResponseDTO signIn(SignInDTO signInUser) throws NoSuchAlgorithmException {
-        Optional<UserInfo> userInfo = userRepository.findByEmail(signInUser.getEmail());
-        if(userInfo.isPresent()){
-            String signInUserPassword = signInUser.getPassword();
-            String checkPassword = hashPassword(signInUserPassword);
-            if(checkPassword.equals(userInfo.get().getPassword())){
-                AuthenticationToken token = userInfo.get().getToken();
-                if(Objects.isNull(token)){
-                    throw new TokenNullException("Токен не найден!");
-                }else{
-                    return new SignInResponseDTO("success",token.getToken());
-                }
-            }else{
-                throw new AuthenticationFailException("Неверный пароль или логин!");
-            }
-        }else{
-            throw new AuthenticationFailException("Неверный пароль или логин!");
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Optional<UserInfo> user = repository.findByEmail(email);
+        if(user.isEmpty()){
+            throw new UsernameNotFoundException("Пользователь не найден!");
         }
+        return user.get();
     }
 
-
-    private String hashPassword(String password) throws NoSuchAlgorithmException {
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        md.update(password.getBytes());
-        byte[] digest = md.digest();
-        return DatatypeConverter.printHexBinary(digest).toUpperCase();
+    public SignUpResponseDTO register(UserInfo user) {
+        var userInfo = UserInfo.builder()
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .password(passwordEncoder.encode(user.getPassword()))
+                .role("ROLE_USER").build();
+        repository.save(userInfo);
+        String token = generateToken();
+        AuthenticationToken authenticationToken = new AuthenticationToken();
+        authenticationToken.setUser(userInfo);
+        authenticationToken.setToken(token);
+        authenticationToken.setCreatedAt(new Date());
+        tokenRepository.save(authenticationToken);
+        return new SignUpResponseDTO("success",token);
     }
 
-    public Optional<UserInfo> findById(int userId) {
-        return userRepository.findById(userId);
+    private String generateToken() {
+        return UUID.randomUUID().toString();
+    }
+
+    public SignInResponseDTO authenticate(SignInDTO signInDTO) {
+        return null;
     }
 }

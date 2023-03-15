@@ -9,6 +9,7 @@ import com.project.onlineshopping.exceptions.ErrorMessage;
 import com.project.onlineshopping.exceptions.TokenNullException;
 import com.project.onlineshopping.exceptions.UserAlreadyExistException;
 import com.project.onlineshopping.model.UserInfo;
+import com.project.onlineshopping.service.AuthenticationService;
 import com.project.onlineshopping.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -23,18 +24,17 @@ import java.security.NoSuchAlgorithmException;
 @RequestMapping("/auth")
 public class AuthenticationController {
     private final ModelMapper modelMapper;
-    private final UserService userService;
+    private final AuthenticationService authenticationService;
 
-    @PostMapping("/sign-up")
-    public ResponseEntity<SignUpResponseDTO> signUp(@RequestBody UserInfoDTO userDTO){
+    @PostMapping("/register")
+    public ResponseEntity<SignUpResponseDTO> register(@RequestBody UserInfoDTO userDTO){
         UserInfo user = convert(userDTO);
-        userService.signUp(user);
-        return new ResponseEntity<>(new SignUpResponseDTO("success","Пользователь успешно зарегистрировалось!"),HttpStatus.OK);
+        return new ResponseEntity<>(authenticationService.register(user),HttpStatus.OK);
     }
 
     @PostMapping("/sign-in")
-    public ResponseEntity<SignInResponseDTO> signIn(@RequestBody SignInDTO signInDTO) throws NoSuchAlgorithmException {
-            return new ResponseEntity<>(userService.signIn(signInDTO),HttpStatus.OK);
+    public ResponseEntity<SignInResponseDTO> signIn(@RequestBody SignInDTO signInDTO) {
+            return new ResponseEntity<>(authenticationService.authenticate(signInDTO),HttpStatus.OK);
     }
 
     public UserInfo convert(UserInfoDTO userDTO){

@@ -47,6 +47,9 @@ public class Product {
     @Column(name = "quantity")
     private Integer quantity;
 
+//    @OneToOne(targetEntity = Image.class)
+//    private Image image;
+
     @OneToOne(targetEntity = Product_size.class)
     @JoinColumn(name = "product_size_id",referencedColumnName = "id")
     private Product_size productSize;

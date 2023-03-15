@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProductDTO {
     private String name;
-    private String imageURL;
     private double price;
     private String description;
     private String carcas;

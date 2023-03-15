@@ -1,28 +1,37 @@
 package com.project.onlineshopping.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 import java.util.UUID;
 
-@Entity
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@Entity
 @Table(name = "authenticationtoken")
 public class AuthenticationToken {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "token")
+
+    @Column(name = "token",unique = true)
     private String token;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "token_type")
+    public TokenType tokenType = TokenType.BEARER;
+    @Column(name = "revoked")
+    public boolean revoked;
     @Column(name = "createdat")
     private Date createdAt;
-    @OneToOne(targetEntity = UserInfo.class,fetch = FetchType.EAGER)
+    @Column(name = "expired")
+    public boolean expired;
+    @OneToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private UserInfo user;
 

@@ -27,13 +27,13 @@ public class CartController {
     private final ProductService productService;
     private final UserService userService;
     private final CardService cardService;
-    @PostMapping("/add/{user_id}")
+    @PostMapping("/post/add/{user_id}")
     public ResponseEntity<ApiResponse> addToCart(@RequestBody CartDTO cartDTO,
                                                  @PathVariable("user_id") int user_id){
         cardService.save(cartDTO,user_id);
         return new ResponseEntity<>(new ApiResponse(true,"Товар успешно добавлен в корзину!"), HttpStatus.OK);
     }
-    @GetMapping("/{user_id}")
+    @GetMapping("/get/{user_id}")
     public ResponseEntity<List<CartGet>> getCart(@PathVariable("user_id") int id){
         Optional<UserInfo> user = userService.findById(id);
         if(user.isEmpty()){
@@ -45,7 +45,7 @@ public class CartController {
         return new ResponseEntity<>(productList,HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{product_id}/{user_id}")
+    @DeleteMapping("/post/delete/{product_id}/{user_id}")
     public ResponseEntity<ApiResponse> deleteProductFromCart(@PathVariable("product_id") int product_id,
                                                              @PathVariable("user_id") int user_id){
         Optional<Product> product = productService.findById(product_id);

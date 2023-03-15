@@ -4,10 +4,7 @@ import com.project.onlineshopping.dto.ProductDTO;
 import com.project.onlineshopping.exceptions.CategoryNotFoundException;
 import com.project.onlineshopping.exceptions.ErrorMessage;
 import com.project.onlineshopping.exceptions.ProductNotFoundException;
-import com.project.onlineshopping.model.Category;
-import com.project.onlineshopping.model.Product;
-import com.project.onlineshopping.model.Product_size;
-import com.project.onlineshopping.model.Type;
+import com.project.onlineshopping.model.*;
 import com.project.onlineshopping.service.ProductService;
 import com.project.onlineshopping.utils.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,11 +26,11 @@ import java.util.Optional;
 public class ProductController {
     private final ProductService productService;
     private final ModelMapper modelMapper;
-    @GetMapping("/")
+    @GetMapping("/get/")
     public ResponseEntity<List<Product>> productList(){
         return new ResponseEntity<>(productService.findAll(),HttpStatus.OK);
     }
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<Product> findProductById(@PathVariable("id") int id){
         Optional<Product> product = productService.findById(id);
         if(product.isEmpty()){
@@ -40,7 +38,7 @@ public class ProductController {
         }
         return new ResponseEntity<>(product.get(),HttpStatus.OK);
     }
-    @PostMapping("/create")
+    @PostMapping("/post/create")
     public ResponseEntity<ApiResponse> createProduct(@RequestBody ProductDTO productDTO){
 //        Product product = convert(productDTO);
         Product product = convertViaModelMapper(productDTO);
@@ -71,7 +69,7 @@ public class ProductController {
         product.setName(productDTO.getName());
         product.setPrice(productDTO.getPrice());
         product.setDescription(productDTO.getDescription());
-        product.setImageURL(productDTO.getImageURL());
+//        product.setImageURL(productDTO.getImageURL());
         product.setCarcas(productDTO.getCarcas());
         product.setMaterial(productDTO.getMaterial());
         product.setDecorative_pillow(productDTO.getDecorative_pillow());
