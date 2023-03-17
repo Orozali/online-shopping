@@ -31,7 +31,7 @@ public class AuthenticationToken {
     private Date createdAt;
     @Column(name = "expired")
     public boolean expired;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_id",referencedColumnName = "id")
     private UserInfo user;
 

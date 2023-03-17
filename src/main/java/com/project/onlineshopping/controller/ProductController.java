@@ -7,10 +7,16 @@ import com.project.onlineshopping.exceptions.ProductNotFoundException;
 import com.project.onlineshopping.model.*;
 import com.project.onlineshopping.service.ProductService;
 import com.project.onlineshopping.utils.ApiResponse;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,12 +32,13 @@ import java.util.Optional;
 public class ProductController {
     private final ProductService productService;
     private final ModelMapper modelMapper;
-    @GetMapping("/get/")
+    @GetMapping("/get/all")
     public ResponseEntity<List<Product>> productList(){
         return new ResponseEntity<>(productService.findAll(),HttpStatus.OK);
     }
     @GetMapping("/get/{id}")
     public ResponseEntity<Product> findProductById(@PathVariable("id") int id){
+
         Optional<Product> product = productService.findById(id);
         if(product.isEmpty()){
             throw new ProductNotFoundException("Такой товар не найден!");
@@ -40,7 +47,6 @@ public class ProductController {
     }
     @PostMapping("/post/create")
     public ResponseEntity<ApiResponse> createProduct(@RequestBody ProductDTO productDTO){
-//        Product product = convert(productDTO);
         Product product = convertViaModelMapper(productDTO);
         productService.save(product);
         return new ResponseEntity<>(new ApiResponse(true
@@ -57,34 +63,13 @@ public class ProductController {
         ErrorMessage msg = new ErrorMessage(exception.getMessage());
         return new ResponseEntity<>(msg,HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler
+    public ResponseEntity<ErrorMessage> tokenFail(ExpiredJwtException e){
+        ErrorMessage message = new ErrorMessage(e.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
     public Product convertViaModelMapper(ProductDTO productDTO){
         return modelMapper.map(productDTO, Product.class);
     }
-    public Product convert(ProductDTO productDTO){
-        Category category = new Category();
-        Type type = new Type();
-        Product_size productSize = new Product_size(productDTO.getProductSizeDTO().getLength()
-                ,productDTO.getProductSizeDTO().getWidth(),productDTO.getProductSizeDTO().getHeight());
-        Product product = new Product();
-        product.setName(productDTO.getName());
-        product.setPrice(productDTO.getPrice());
-        product.setDescription(productDTO.getDescription());
-//        product.setImageURL(productDTO.getImageURL());
-        product.setCarcas(productDTO.getCarcas());
-        product.setMaterial(productDTO.getMaterial());
-        product.setDecorative_pillow(productDTO.getDecorative_pillow());
-        product.setDelivery_option(productDTO.getDelivery_option());
-        product.setManufacturer(productDTO.getManufacturer());
-        product.setMeachanism(productDTO.getMeachanism());
-        product.setRemovable_case(productDTO.getRemovable_case());
-        product.setUsb(productDTO.getUsb());
 
-        type.setName(productDTO.getTypeDTO().getName());
-        category.setName(productDTO.getCategoryDTO().getName());
-
-        product.setCategory(category);
-        product.setType(type);
-        product.setProductSize(productSize);
-        return product;
-    }
 }

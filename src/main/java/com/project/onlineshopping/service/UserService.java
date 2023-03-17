@@ -23,8 +23,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
     private final UserRepository repository;
-    private final TokenRepository tokenRepository;
-    private final PasswordEncoder passwordEncoder;
     public Optional<UserInfo> findById(int id){
         return repository.findById(id);
     }
@@ -38,28 +36,6 @@ public class UserService implements UserDetailsService {
         return user.get();
     }
 
-    public SignUpResponseDTO register(UserInfo user) {
-        var userInfo = UserInfo.builder()
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .password(passwordEncoder.encode(user.getPassword()))
-                .role("ROLE_USER").build();
-        repository.save(userInfo);
-        String token = generateToken();
-        AuthenticationToken authenticationToken = new AuthenticationToken();
-        authenticationToken.setUser(userInfo);
-        authenticationToken.setToken(token);
-        authenticationToken.setCreatedAt(new Date());
-        tokenRepository.save(authenticationToken);
-        return new SignUpResponseDTO("success",token);
-    }
 
-    private String generateToken() {
-        return UUID.randomUUID().toString();
-    }
 
-    public SignInResponseDTO authenticate(SignInDTO signInDTO) {
-        return null;
-    }
 }

@@ -11,6 +11,7 @@ import com.project.onlineshopping.exceptions.UserAlreadyExistException;
 import com.project.onlineshopping.model.UserInfo;
 import com.project.onlineshopping.service.AuthenticationService;
 import com.project.onlineshopping.service.UserService;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ import java.security.NoSuchAlgorithmException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("/authenticate")
 public class AuthenticationController {
     private final ModelMapper modelMapper;
     private final AuthenticationService authenticationService;
@@ -36,7 +37,6 @@ public class AuthenticationController {
     public ResponseEntity<SignInResponseDTO> signIn(@RequestBody SignInDTO signInDTO) {
             return new ResponseEntity<>(authenticationService.authenticate(signInDTO),HttpStatus.OK);
     }
-
     public UserInfo convert(UserInfoDTO userDTO){
         return modelMapper.map(userDTO, UserInfo.class);
     }
@@ -56,6 +56,11 @@ public class AuthenticationController {
     }
     @ExceptionHandler
     public ResponseEntity<ErrorMessage> tokenFail(TokenNullException e){
+        ErrorMessage message = new ErrorMessage(e.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler
+    public ResponseEntity<ErrorMessage> tokenFail(ExpiredJwtException e){
         ErrorMessage message = new ErrorMessage(e.getMessage());
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }

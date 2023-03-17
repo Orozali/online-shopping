@@ -12,9 +12,12 @@ import com.project.onlineshopping.service.CardService;
 import com.project.onlineshopping.service.ProductService;
 import com.project.onlineshopping.service.UserService;
 import com.project.onlineshopping.utils.ApiResponse;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,13 +30,16 @@ public class CartController {
     private final ProductService productService;
     private final UserService userService;
     private final CardService cardService;
-    @PostMapping("/post/add/{user_id}")
+    @PostMapping("/add/{user_id}")
     public ResponseEntity<ApiResponse> addToCart(@RequestBody CartDTO cartDTO,
                                                  @PathVariable("user_id") int user_id){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserInfo user = (UserInfo) authentication.getPrincipal();
+        System.out.println(user.getFirstName());
         cardService.save(cartDTO,user_id);
         return new ResponseEntity<>(new ApiResponse(true,"Товар успешно добавлен в корзину!"), HttpStatus.OK);
     }
-    @GetMapping("/get/{user_id}")
+    @GetMapping("/{user_id}")
     public ResponseEntity<List<CartGet>> getCart(@PathVariable("user_id") int id){
         Optional<UserInfo> user = userService.findById(id);
         if(user.isEmpty()){
@@ -45,7 +51,7 @@ public class CartController {
         return new ResponseEntity<>(productList,HttpStatus.OK);
     }
 
-    @DeleteMapping("/post/delete/{product_id}/{user_id}")
+    @DeleteMapping("/delete/{product_id}/{user_id}")
     public ResponseEntity<ApiResponse> deleteProductFromCart(@PathVariable("product_id") int product_id,
                                                              @PathVariable("user_id") int user_id){
         Optional<Product> product = productService.findById(product_id);
@@ -68,5 +74,10 @@ public class CartController {
     @ExceptionHandler
     public ResponseEntity<ErrorMessage> itemLessThanZero(ItemLessThanZeroException exception){
         return new ResponseEntity<>(new ErrorMessage(exception.getMessage()),HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler
+    public ResponseEntity<ErrorMessage> tokenFail(ExpiredJwtException e){
+        ErrorMessage message = new ErrorMessage(e.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
 }

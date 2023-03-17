@@ -8,6 +8,7 @@ import com.project.onlineshopping.model.Type;
 import com.project.onlineshopping.service.CategoryService;
 import com.project.onlineshopping.service.TypeService;
 import com.project.onlineshopping.utils.ApiResponse;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
     private final TypeService typeService;
-    @GetMapping("/get/")
+    @GetMapping("/get/all")
     public ResponseEntity<List<Category>> categoryList(){
         return new ResponseEntity<>(categoryService.findAll(), HttpStatus.OK);
     }
@@ -60,6 +61,11 @@ public class CategoryController {
     public ResponseEntity<ErrorMessage> modelAlreadyExist(ModelAlreadyExistException exception){
         ErrorMessage message = new ErrorMessage(exception.getMessage());
         return new ResponseEntity<>(message,HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler
+    public ResponseEntity<ErrorMessage> tokenFail(ExpiredJwtException e){
+        ErrorMessage message = new ErrorMessage(e.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
 
 }

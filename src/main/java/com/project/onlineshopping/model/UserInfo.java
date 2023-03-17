@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Getter
@@ -33,8 +34,8 @@ public class UserInfo implements UserDetails {
     private String role;
 
 
-    @OneToOne(mappedBy = "user")
-    private AuthenticationToken token;
+    @OneToMany(mappedBy = "user")
+    private List<AuthenticationToken> token;
 
     public UserInfo(String firstName, String lastName, String email, String password){
         this.firstName = firstName;
@@ -45,7 +46,7 @@ public class UserInfo implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(this.role));
+        return Collections.singletonList(new SimpleGrantedAuthority(this.getRole()));
     }
 
     @Override
@@ -75,5 +76,8 @@ public class UserInfo implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+    public UserInfo getUser(){
+        return this;
     }
 }

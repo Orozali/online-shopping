@@ -13,10 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,13 +36,14 @@ public class CardService {
         if(quantity-cartDTO.getQuantity()<0){
             throw new ItemLessThanZeroException("У нас есть только "+quantity+" количество товаров!");
         }
-        Optional<Cart> cartProduct = cardRepository.findByProductId(product.get().getId());
-        if(cartProduct.isPresent()){
-            if(quantity-(cartProduct.get().getQuantity()+cartDTO.getQuantity())<0){
+        Optional<Cart> cartUser = cardRepository.findCartByUserId(user_id);
+//        Optional<Cart> cartUser = cardRepository.findByUserId(user_id);
+        if(cartUser.isPresent() && Objects.equals(cartUser.get().getProduct().getId(), cartDTO.getProduct_id())){
+            if(quantity-(cartUser.get().getQuantity()+cartDTO.getQuantity())<0){
                 throw new ItemLessThanZeroException("У нас есть только "+quantity+" количество товаров!");
             }
             else {
-                cartProduct.get().setQuantity(cartProduct.get().getQuantity()+cartDTO.getQuantity());
+                cartUser.get().setQuantity(cartUser.get().getQuantity()+cartDTO.getQuantity());
             }
         }else {
             Cart cart = new Cart(user.get(),product.get(),new Date(),cartDTO.getQuantity());

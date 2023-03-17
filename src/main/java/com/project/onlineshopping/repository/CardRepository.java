@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface CardRepository extends JpaRepository<Cart,Integer> {
     @Query("SELECT p FROM Cart p where p.userInfo.id = ?1")
     List<Cart> findByUserId(int id);
+    @Query("SELECT p FROM Cart p where p.userInfo.id = ?1")
+    Optional<Cart> findCartByUserId(int id);
     @Modifying
     @Query("delete FROM Cart p where p.userInfo.id = ?1 AND p.product.id = ?2")
     void deleteProduct(Integer id, Integer id1);

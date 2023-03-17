@@ -3,6 +3,7 @@ package com.project.onlineshopping.service;
 import com.project.onlineshopping.dto.SignInDTO;
 import com.project.onlineshopping.dto.SignInResponseDTO;
 import com.project.onlineshopping.dto.SignUpResponseDTO;
+import com.project.onlineshopping.exceptions.UserAlreadyExistException;
 import com.project.onlineshopping.model.AuthenticationToken;
 import com.project.onlineshopping.model.TokenType;
 import com.project.onlineshopping.model.UserInfo;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,12 +29,16 @@ public class AuthenticationService {
   private final AuthenticationManager authenticationManager;
 
   public SignUpResponseDTO register(UserInfo request) {
+    Optional<UserInfo> findByEmail = repository.findByEmail(request.getEmail());
+    if(findByEmail.isPresent()){
+      throw new UserAlreadyExistException("Пользователь с таким электронным адресам уже существует!");
+    }
     var user = UserInfo.builder()
         .firstName(request.getFirstName())
         .lastName(request.getLastName())
         .email(request.getEmail())
         .password(passwordEncoder.encode(request.getPassword()))
-        .role("ROLE_USER")
+        .role("ROLE_ADMIN")
         .build();
     var savedUser = repository.save(user);
     var jwtToken = jwtService.generateToken(user);
