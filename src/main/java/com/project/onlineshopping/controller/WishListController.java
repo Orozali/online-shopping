@@ -29,13 +29,8 @@ public class WishListController {
     private final ProductService productService;
 
 
-    @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addProductToWishList(@RequestBody Product product
-                                        , @RequestParam("token") String token){
-        tokenService.authenticate(token);
-        UserInfo userInfo = tokenService.getUser(token);
-        WishList wishList = new WishList(userInfo,product);
-        wishListService.createWishList(wishList); //TODO //Product is created problem
+    @PostMapping("/post/add")
+    public ResponseEntity<ApiResponse> addProductToWishList(@RequestBody Product product){
         return new ResponseEntity<>(new ApiResponse(true,"A new WishList was created"),HttpStatus.CREATED);
     }
 

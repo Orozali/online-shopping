@@ -5,7 +5,6 @@ import com.project.onlineshopping.dto.CartGet;
 import com.project.onlineshopping.exceptions.ErrorMessage;
 import com.project.onlineshopping.exceptions.ItemLessThanZeroException;
 import com.project.onlineshopping.exceptions.ProductNotFoundException;
-import com.project.onlineshopping.model.Cart;
 import com.project.onlineshopping.model.Product;
 import com.project.onlineshopping.model.UserInfo;
 import com.project.onlineshopping.service.CardService;
@@ -30,6 +29,7 @@ public class CartController {
     private final ProductService productService;
     private final UserService userService;
     private final CardService cardService;
+
     @PostMapping("/add/{user_id}")
     public ResponseEntity<ApiResponse> addToCart(@RequestBody CartDTO cartDTO,
                                                  @PathVariable("user_id") int user_id){
@@ -39,6 +39,7 @@ public class CartController {
         cardService.save(cartDTO,user_id);
         return new ResponseEntity<>(new ApiResponse(true,"Товар успешно добавлен в корзину!"), HttpStatus.OK);
     }
+
     @GetMapping("/{user_id}")
     public ResponseEntity<List<CartGet>> getCart(@PathVariable("user_id") int id){
         Optional<UserInfo> user = userService.findById(id);
@@ -46,8 +47,6 @@ public class CartController {
             throw new ProductNotFoundException("Пользователь не найден!");
         }
         List<CartGet> productList = cardService.getCart(id);
-//        Integer quantity = cardService.productQuantity();
-//        CartGet cartGet = new CartGet(productList,)
         return new ResponseEntity<>(productList,HttpStatus.OK);
     }
 
@@ -66,15 +65,16 @@ public class CartController {
         return new ResponseEntity<>(new ApiResponse(true,"Товар успешно удален из корзины"), HttpStatus.OK);
     }
 
-
     @ExceptionHandler
     public ResponseEntity<ErrorMessage> productNotFound(ProductNotFoundException exception){
         return new ResponseEntity<>(new ErrorMessage(exception.getMessage()),HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler
     public ResponseEntity<ErrorMessage> itemLessThanZero(ItemLessThanZeroException exception){
         return new ResponseEntity<>(new ErrorMessage(exception.getMessage()),HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler
     public ResponseEntity<ErrorMessage> tokenFail(ExpiredJwtException e){
         ErrorMessage message = new ErrorMessage(e.getMessage());

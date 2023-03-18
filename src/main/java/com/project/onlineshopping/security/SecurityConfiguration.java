@@ -25,7 +25,7 @@ public class SecurityConfiguration {
                 .disable()
                 .authorizeHttpRequests()
                 .requestMatchers("/category/post/**","/product/post/**").hasRole("ADMIN")
-                .requestMatchers("/product/get/**","/category/get/**","/authenticate/**","/swagger-ui/**")
+                .requestMatchers("/product/get/**","/category/get/**","/auth/**","/search/**","/swagger-ui/**")
                 .permitAll()
                 .anyRequest()
                 .hasAnyRole("ADMIN","USER")

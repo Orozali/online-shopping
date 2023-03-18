@@ -32,10 +32,14 @@ import java.util.Optional;
 public class ProductController {
     private final ProductService productService;
     private final ModelMapper modelMapper;
+
+
     @GetMapping("/get/all")
     public ResponseEntity<List<Product>> productList(){
         return new ResponseEntity<>(productService.findAll(),HttpStatus.OK);
     }
+
+
     @GetMapping("/get/{id}")
     public ResponseEntity<Product> findProductById(@PathVariable("id") int id){
 
@@ -45,6 +49,8 @@ public class ProductController {
         }
         return new ResponseEntity<>(product.get(),HttpStatus.OK);
     }
+
+
     @PostMapping("/post/create")
     public ResponseEntity<ApiResponse> createProduct(@RequestBody ProductDTO productDTO){
         Product product = convertViaModelMapper(productDTO);
@@ -53,21 +59,28 @@ public class ProductController {
                 ,"A new product created"),HttpStatus.CREATED);
     }
 
+
     @ExceptionHandler
     public ResponseEntity<ErrorMessage> categoryNotFound(CategoryNotFoundException exception){
         ErrorMessage msg = new ErrorMessage(exception.getMsg());
         return new ResponseEntity<>(msg,HttpStatus.BAD_REQUEST);
     }
+
+
     @ExceptionHandler
     public ResponseEntity<ErrorMessage> productNotFound(ProductNotFoundException exception){
         ErrorMessage msg = new ErrorMessage(exception.getMessage());
         return new ResponseEntity<>(msg,HttpStatus.BAD_REQUEST);
     }
+
+
     @ExceptionHandler
     public ResponseEntity<ErrorMessage> tokenFail(ExpiredJwtException e){
         ErrorMessage message = new ErrorMessage(e.getMessage());
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
+
+
     public Product convertViaModelMapper(ProductDTO productDTO){
         return modelMapper.map(productDTO, Product.class);
     }
