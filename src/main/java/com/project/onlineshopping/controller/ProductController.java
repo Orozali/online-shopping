@@ -1,8 +1,11 @@
 package com.project.onlineshopping.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.onlineshopping.dto.ProductDTO;
 import com.project.onlineshopping.exceptions.CategoryNotFoundException;
 import com.project.onlineshopping.exceptions.ErrorMessage;
+import com.project.onlineshopping.exceptions.JwtExpiredException;
 import com.project.onlineshopping.exceptions.ProductNotFoundException;
 import com.project.onlineshopping.model.*;
 import com.project.onlineshopping.service.ProductService;
@@ -10,21 +13,16 @@ import com.project.onlineshopping.utils.ApiResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/product")
@@ -32,6 +30,8 @@ import java.util.Optional;
 public class ProductController {
     private final ProductService productService;
     private final ModelMapper modelMapper;
+    private final ObjectMapper objectMapper;
+
 
 
     @GetMapping("/get/all")
@@ -51,10 +51,36 @@ public class ProductController {
     }
 
 
-    @PostMapping("/post/create")
-    public ResponseEntity<ApiResponse> createProduct(@RequestBody ProductDTO productDTO){
-        Product product = convertViaModelMapper(productDTO);
-        productService.save(product);
+//    @PostMapping("/post/uploadImage")
+//    public ResponseEntity<ApiResponse> uplaodImage(@RequestParam("image") MultipartFile multipartFile){
+//        try{
+//            imageService.save(multipartFile);
+//        }catch (IOException e){
+//            System.out.println(e.getMessage());
+//        }
+//        return new ResponseEntity<>(new ApiResponse(true,"success"),HttpStatus.OK);
+//    }
+//
+//    @GetMapping("/download/{fileName}")
+//    public ResponseEntity<byte[]> downloadImage(@PathVariable String fileName) {
+//        byte[] image = imageService.downloadImage(fileName);
+//        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.valueOf("image/png")).body(image);
+//    }
+
+
+    @PostMapping(value = {"/post/create"}, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<ApiResponse> createProduct(@RequestParam("product") String productDTO
+                                                     ,@RequestParam("image") MultipartFile multipartFile){
+        try {
+            ProductDTO product = objectMapper.readValue(productDTO, ProductDTO.class);
+            Product product1 = convertViaModelMapper(product);
+            productService.save(product1,multipartFile);
+        }catch(JsonProcessingException e){
+            return new ResponseEntity<>(new ApiResponse(false,"JsonProcessingException"),HttpStatus.BAD_REQUEST);
+        }catch (IOException e){
+            return  new ResponseEntity<>(new ApiResponse(false, "IOException"),HttpStatus.BAD_REQUEST);
+        }
+
         return new ResponseEntity<>(new ApiResponse(true
                 ,"A new product created"),HttpStatus.CREATED);
     }
@@ -81,6 +107,11 @@ public class ProductController {
     }
 
 
+    @ExceptionHandler
+    public ResponseEntity<ErrorMessage> jwtException(JwtExpiredException e){
+        ErrorMessage message = new ErrorMessage(e.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
     public Product convertViaModelMapper(ProductDTO productDTO){
         return modelMapper.map(productDTO, Product.class);
     }

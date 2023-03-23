@@ -2,9 +2,7 @@ package com.project.onlineshopping.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.apache.catalina.User;
 
 import java.util.Date;
@@ -13,6 +11,8 @@ import java.util.Date;
 @Table(name = "wishlist")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class WishList {
     @Id
@@ -29,9 +29,4 @@ public class WishList {
     @JoinColumn(name = "product_id",referencedColumnName = "id")
     private Product product;
 
-    public WishList(UserInfo user,Product product){
-        this.userInfo = user;
-        this.product = product;
-        this.createdAt = new Date();
-    }
 }

@@ -86,6 +86,13 @@ public class AuthenticationController {
     }
 
 
+    @ExceptionHandler
+    public ResponseEntity<ErrorMessage> jwtException(JwtExpiredException e){
+        ErrorMessage message = new ErrorMessage(e.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
+
+
     public UserInfo convert(UserInfoDTO userDTO){
         return modelMapper.map(userDTO, UserInfo.class);
     }

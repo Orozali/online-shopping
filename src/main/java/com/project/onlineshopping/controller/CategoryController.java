@@ -2,6 +2,7 @@ package com.project.onlineshopping.controller;
 
 import com.project.onlineshopping.exceptions.CategoryNotFoundException;
 import com.project.onlineshopping.exceptions.ErrorMessage;
+import com.project.onlineshopping.exceptions.JwtExpiredException;
 import com.project.onlineshopping.exceptions.ModelAlreadyExistException;
 import com.project.onlineshopping.model.Category;
 import com.project.onlineshopping.model.Type;
@@ -80,6 +81,13 @@ public class CategoryController {
 
     @ExceptionHandler
     public ResponseEntity<ErrorMessage> tokenFail(ExpiredJwtException e){
+        ErrorMessage message = new ErrorMessage(e.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorMessage> jwtException(JwtExpiredException e){
         ErrorMessage message = new ErrorMessage(e.getMessage());
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }

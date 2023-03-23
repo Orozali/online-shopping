@@ -4,6 +4,7 @@ import com.project.onlineshopping.dto.CartDTO;
 import com.project.onlineshopping.dto.CartGet;
 import com.project.onlineshopping.exceptions.ErrorMessage;
 import com.project.onlineshopping.exceptions.ItemLessThanZeroException;
+import com.project.onlineshopping.exceptions.JwtExpiredException;
 import com.project.onlineshopping.exceptions.ProductNotFoundException;
 import com.project.onlineshopping.model.Product;
 import com.project.onlineshopping.model.UserInfo;
@@ -15,8 +16,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,9 +32,6 @@ public class CartController {
     @PostMapping("/add/{user_id}")
     public ResponseEntity<ApiResponse> addToCart(@RequestBody CartDTO cartDTO,
                                                  @PathVariable("user_id") int user_id){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserInfo user = (UserInfo) authentication.getPrincipal();
-        System.out.println(user.getFirstName());
         cardService.save(cartDTO,user_id);
         return new ResponseEntity<>(new ApiResponse(true,"Товар успешно добавлен в корзину!"), HttpStatus.OK);
     }
@@ -77,6 +73,11 @@ public class CartController {
 
     @ExceptionHandler
     public ResponseEntity<ErrorMessage> tokenFail(ExpiredJwtException e){
+        ErrorMessage message = new ErrorMessage(e.getMessage());
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler
+    public ResponseEntity<ErrorMessage> jwtException(JwtExpiredException e){
         ErrorMessage message = new ErrorMessage(e.getMessage());
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }

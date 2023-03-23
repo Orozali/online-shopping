@@ -20,8 +20,6 @@ public class Product {
     private Integer id;
     @Column(name = "name")
     private String name;
-    @Column(name = "imageurl")
-    private String imageURL;
     @Column(name = "price")
     private double price;
     @Column(name = "description")
@@ -47,8 +45,9 @@ public class Product {
     @Column(name = "quantity")
     private Integer quantity;
 
-//    @OneToOne(targetEntity = Image.class)
-//    private Image image;
+    @OneToOne
+    @JoinColumn(name = "image_id",referencedColumnName = "id")
+    private FileData fileData;
 
     @OneToOne(targetEntity = Product_size.class)
     @JoinColumn(name = "product_size_id",referencedColumnName = "id")
